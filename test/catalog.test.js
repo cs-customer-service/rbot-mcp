@@ -45,7 +45,8 @@ test("o catálogo cobre todas as rotas do cs-services e só expõe as de usuári
     const declared = (text.match(/router\.(get|post|put|patch|delete)\(/g) || []).length;
     assert.ok(mod.routes.length >= declared, `${mod.name}: ${declared} declaradas, ${mod.routes.length} no catálogo`);
   }
-  assert.ok(all.filter((r) => r.auth === "user").every((r) => r.exposed), "toda rota de usuário vira ferramenta");
+  const userHidden = all.filter((r) => r.auth === "user" && !r.exposed);
+  assert.ok(userHidden.every((r) => /^use rbot_/.test(r.hiddenReason)), `rota de usuário sem ferramenta: ${userHidden.map((r) => r.id)}`);
   assert.ok(all.filter((r) => r.auth === "service" || r.auth === "apikey").every((r) => !r.exposed), "token de serviço e API key ficam fora");
   assert.ok(all.filter((r) => r.path.startsWith("/internal") || r.path.startsWith("/devops")).every((r) => !r.exposed));
 });

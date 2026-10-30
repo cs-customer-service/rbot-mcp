@@ -61,6 +61,36 @@ const stringLiteral = (arg) => {
   return m ? m[2] : null;
 };
 
+export function stripComments(text) {
+  let out = "";
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === "\"" || ch === "'" || ch === "`") {
+      const end = skipString(text, i);
+      if (end < 0) return out + text.slice(i);
+      out += text.slice(i, end + 1);
+      i = end;
+      continue;
+    }
+    if (ch === "/" && text[i + 1] === "/") {
+      const end = text.indexOf("\n", i);
+      const stop = end < 0 ? text.length : end;
+      out += " ".repeat(stop - i);
+      i = stop - 1;
+      continue;
+    }
+    if (ch === "/" && text[i + 1] === "*") {
+      const end = text.indexOf("*/", i + 2);
+      const stop = end < 0 ? text.length : end + 2;
+      out += text.slice(i, stop).replace(/[^\n]/g, " ");
+      i = stop - 1;
+      continue;
+    }
+    out += ch;
+  }
+  return out;
+}
+
 function calls(text, pattern) {
   const found = [];
   const re = new RegExp(pattern, "g");
@@ -118,7 +148,8 @@ function expandLoopRoute(text, index, method, args) {
   }).filter((route) => !route.path.includes("${"));
 }
 
-export function parseRouterFile(text) {
+export function parseRouterFile(source) {
+  const text = stripComments(source);
   const routes = calls(text, `\\brouter\\.(${METHODS.join("|")})\\s*\\(`).flatMap(({ match, args }) => {
     const path = stringLiteral(args[0]);
     if (path === null) return expandLoopRoute(text, match.index, match[1], args);
