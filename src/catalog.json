@@ -1,7 +1,7 @@
 {
  "source": {
   "repository": "cs-customer-service/cs-services",
-  "commit": "aa035ed"
+  "commit": "7954dde"
  },
  "modules": [
   {
@@ -9815,6 +9815,244 @@
      "path": "/warmup/connections",
      "params": [],
      "auth": "user",
+     "encryptedBody": false,
+     "permissions": [],
+     "input": {},
+     "exposed": true
+    }
+   ]
+  },
+  {
+   "name": "webchat",
+   "mount": "/webchat",
+   "routes": [
+    {
+     "id": "GET /webchat/config",
+     "method": "GET",
+     "path": "/webchat/config",
+     "params": [],
+     "auth": "user",
+     "encryptedBody": false,
+     "permissions": [
+      "requireAnyPermission(\"service.agent\")"
+     ],
+     "input": {},
+     "exposed": true
+    },
+    {
+     "id": "PUT /webchat/config",
+     "method": "PUT",
+     "path": "/webchat/config",
+     "params": [],
+     "auth": "user",
+     "encryptedBody": true,
+     "permissions": [
+      "requireAnyPermission(\"service.agent\")"
+     ],
+     "input": {
+      "body": {
+       "type": "object",
+       "properties": {
+        "enabled": {
+         "type": "boolean"
+        },
+        "allowedOrigins": {
+         "type": "array",
+         "items": {
+          "type": "string",
+          "maxLength": 200
+         },
+         "maxItems": 10
+        },
+        "theme": {
+         "type": "object",
+         "properties": {
+          "title": {
+           "type": "string",
+           "minLength": 1,
+           "maxLength": 60
+          },
+          "subtitle": {
+           "type": "string",
+           "minLength": 0,
+           "maxLength": 120
+          },
+          "agentName": {
+           "type": "string",
+           "minLength": 1,
+           "maxLength": 40
+          },
+          "welcomeMessage": {
+           "type": "string",
+           "minLength": 0,
+           "maxLength": 500
+          },
+          "placeholder": {
+           "type": "string",
+           "minLength": 1,
+           "maxLength": 80
+          },
+          "primaryColor": {
+           "type": "string",
+           "pattern": "^#[0-9a-fA-F]{6}$"
+          },
+          "showBranding": {
+           "type": "boolean"
+          },
+          "headerTextColor": {
+           "type": "string",
+           "pattern": "^#[0-9a-fA-F]{6}$"
+          },
+          "backgroundColor": {
+           "type": "string",
+           "pattern": "^#[0-9a-fA-F]{6}$"
+          },
+          "textColor": {
+           "type": "string",
+           "pattern": "^#[0-9a-fA-F]{6}$"
+          },
+          "userBubbleColor": {
+           "type": "string",
+           "pattern": "^#[0-9a-fA-F]{6}$"
+          },
+          "userTextColor": {
+           "type": "string",
+           "pattern": "^#[0-9a-fA-F]{6}$"
+          },
+          "botBubbleColor": {
+           "type": "string",
+           "pattern": "^#[0-9a-fA-F]{6}$"
+          },
+          "botTextColor": {
+           "type": "string",
+           "pattern": "^#[0-9a-fA-F]{6}$"
+          },
+          "borderColor": {
+           "type": "string",
+           "pattern": "^#[0-9a-fA-F]{6}$"
+          },
+          "radius": {
+           "type": "integer",
+           "minimum": 0,
+           "maximum": 32
+          },
+          "bubbleRadius": {
+           "type": "integer",
+           "minimum": 0,
+           "maximum": 28
+          },
+          "fontFamily": {
+           "type": "string",
+           "enum": [
+            "system",
+            "inter",
+            "roboto",
+            "open-sans",
+            "lato",
+            "montserrat",
+            "poppins",
+            "georgia",
+            "mono"
+           ]
+          },
+          "fontSize": {
+           "type": "integer",
+           "minimum": 12,
+           "maximum": 20
+          }
+         },
+         "required": [
+          "title",
+          "subtitle",
+          "agentName",
+          "welcomeMessage",
+          "placeholder",
+          "primaryColor",
+          "showBranding",
+          "headerTextColor",
+          "backgroundColor",
+          "textColor",
+          "userBubbleColor",
+          "userTextColor",
+          "botBubbleColor",
+          "botTextColor",
+          "borderColor",
+          "radius",
+          "bubbleRadius",
+          "fontFamily",
+          "fontSize"
+         ]
+        }
+       },
+       "required": [
+        "enabled",
+        "allowedOrigins",
+        "theme"
+       ]
+      }
+     },
+     "exposed": true
+    },
+    {
+     "id": "POST /webchat/config/rotate-key",
+     "method": "POST",
+     "path": "/webchat/config/rotate-key",
+     "params": [],
+     "auth": "user",
+     "encryptedBody": false,
+     "permissions": [
+      "requireAnyPermission(\"service.agent\")"
+     ],
+     "input": {},
+     "exposed": true
+    },
+    {
+     "id": "GET /webchat/embed/:key",
+     "method": "GET",
+     "path": "/webchat/embed/:key",
+     "params": [
+      "key"
+     ],
+     "auth": "public",
+     "encryptedBody": false,
+     "permissions": [],
+     "input": {},
+     "exposed": true
+    },
+    {
+     "id": "POST /webchat/embed/:key/session",
+     "method": "POST",
+     "path": "/webchat/embed/:key/session",
+     "params": [
+      "key"
+     ],
+     "auth": "public",
+     "encryptedBody": false,
+     "permissions": [],
+     "input": {},
+     "exposed": true
+    },
+    {
+     "id": "GET /webchat/embed/:key/messages",
+     "method": "GET",
+     "path": "/webchat/embed/:key/messages",
+     "params": [
+      "key"
+     ],
+     "auth": "public",
+     "encryptedBody": false,
+     "permissions": [],
+     "input": {},
+     "exposed": true
+    },
+    {
+     "id": "POST /webchat/embed/:key/messages",
+     "method": "POST",
+     "path": "/webchat/embed/:key/messages",
+     "params": [
+      "key"
+     ],
+     "auth": "public",
      "encryptedBody": false,
      "permissions": [],
      "input": {},
