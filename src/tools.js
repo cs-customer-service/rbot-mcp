@@ -60,6 +60,20 @@ export function buildTools(catalog) {
 
 export const SESSION_TOOLS = [
   {
+    name: "rbot_knowledge_import",
+    title: "Import project knowledge",
+    description: "Creates or updates up to 50 knowledge entries through the Rbot API, which generates their vector embeddings. Requires the exact selected project name to protect other organizations. Existing questions on the first 100 entries are updated.",
+    inputSchema: { type: "object", properties: { expectedProjectName: { type: "string", minLength: 1, maxLength: 100 }, items: { type: "array", minItems: 1, maxItems: 50, items: { type: "object", properties: { question: { type: "string", minLength: 1, maxLength: 2000 }, answer: { type: "string", minLength: 1, maxLength: 5000 } }, required: ["question", "answer"], additionalProperties: false } } }, required: ["expectedProjectName", "items"], additionalProperties: false },
+    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: true }
+  },
+  {
+    name: "rbot_select_project",
+    title: "Select Rbot project",
+    description: "Selects exactly one project by ID or exact name and adopts its session for all subsequent calls. Use name Healtix for the Healtix organization; the main organization is a different context.",
+    inputSchema: { type: "object", properties: { id: { type: "string" }, name: { type: "string" } }, additionalProperties: false },
+    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: true }
+  },
+  {
     name: "rbot_login",
     title: "Entrar no RBot",
     description: "Entra no RBot com email e senha do usuário. Sem argumentos, usa RBOT_EMAIL e RBOT_PASSWORD. Para conta com verificação em duas etapas, chame de novo só com twoFactorCode.",

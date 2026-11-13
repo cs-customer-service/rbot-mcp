@@ -1,7 +1,7 @@
 {
  "source": {
   "repository": "cs-customer-service/cs-services",
-  "commit": "7954dde"
+  "commit": "65e905a"
  },
  "modules": [
   {
@@ -1148,6 +1148,64 @@
    "name": "collaborators",
    "mount": "/collaborators",
    "routes": [
+    {
+     "id": "GET /collaborators/knowledge/status",
+     "method": "GET",
+     "path": "/collaborators/knowledge/status",
+     "params": [],
+     "auth": "user",
+     "encryptedBody": false,
+     "permissions": [],
+     "input": {},
+     "exposed": true
+    },
+    {
+     "id": "GET /collaborators/me/unread-email",
+     "method": "GET",
+     "path": "/collaborators/me/unread-email",
+     "params": [],
+     "auth": "user",
+     "encryptedBody": false,
+     "permissions": [],
+     "input": {},
+     "exposed": true
+    },
+    {
+     "id": "PUT /collaborators/me/unread-email",
+     "method": "PUT",
+     "path": "/collaborators/me/unread-email",
+     "params": [],
+     "auth": "user",
+     "encryptedBody": true,
+     "permissions": [],
+     "input": {
+      "body": {
+       "type": "object",
+       "properties": {
+        "enabled": {
+         "type": "boolean"
+        },
+        "delaySeconds": {
+         "type": "integer",
+         "minimum": 15,
+         "maximum": 86400
+        },
+        "intervalMinutes": {
+         "type": "integer",
+         "minimum": 60,
+         "maximum": 10080
+        }
+       },
+       "required": [
+        "enabled",
+        "delaySeconds",
+        "intervalMinutes"
+       ],
+       "additionalProperties": false
+      }
+     },
+     "exposed": true
+    },
     {
      "id": "GET /collaborators/active-users",
      "method": "GET",
@@ -5610,6 +5668,17 @@
    "mount": "/integrations",
    "routes": [
     {
+     "id": "POST /integrations/test",
+     "method": "POST",
+     "path": "/integrations/test",
+     "params": [],
+     "auth": "user",
+     "encryptedBody": true,
+     "permissions": [],
+     "input": {},
+     "exposed": true
+    },
+    {
      "id": "GET /integrations",
      "method": "GET",
      "path": "/integrations",
@@ -5641,8 +5710,100 @@
         },
         "enabled": {
          "type": "boolean"
+        },
+        "list": {
+         "type": "array",
+         "items": {
+          "type": "object",
+          "properties": {
+           "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+           },
+           "description": {
+            "type": "string",
+            "maxLength": 500,
+            "default": ""
+           },
+           "alias": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]{0,49}$"
+           },
+           "status": {
+            "type": "string",
+            "enum": [
+             "active",
+             "inactive"
+            ]
+           },
+           "url": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 2048
+           },
+           "sandboxUrl": {
+            "anyOf": [
+             {
+              "const": ""
+             },
+             {
+              "type": "string",
+              "format": "uri",
+              "maxLength": 2048
+             }
+            ]
+           },
+           "params": {
+            "type": "string",
+            "maxLength": 5000
+           },
+           "inputSchema": {
+            "type": "object",
+            "additionalProperties": {}
+           },
+           "writes": {
+            "type": "boolean",
+            "default": false
+           },
+           "requiresClientContext": {
+            "type": "boolean",
+            "default": false
+           }
+          },
+          "required": [
+           "name",
+           "alias",
+           "status",
+           "url",
+           "inputSchema"
+          ]
+         },
+         "maxItems": 50
+        },
+        "recognition": {
+         "type": "object",
+         "properties": {
+          "enabled": {
+           "type": "boolean"
+          },
+          "findEndpoint": {
+           "type": "string",
+           "maxLength": 2048
+          },
+          "confirmEndpoint": {
+           "type": "string",
+           "maxLength": 2048
+          }
+         },
+         "required": [
+          "enabled",
+          "findEndpoint",
+          "confirmEndpoint"
+         ]
         }
-       }
+       },
+       "additionalProperties": false
       }
      },
      "exposed": true
@@ -9982,6 +10143,94 @@
           "fontFamily",
           "fontSize"
          ]
+        },
+        "form": {
+         "type": "object",
+         "properties": {
+          "enabled": {
+           "type": "boolean"
+          },
+          "title": {
+           "type": "string",
+           "minLength": 0,
+           "maxLength": 80
+          },
+          "fields": {
+           "type": "array",
+           "items": {
+            "type": "object",
+            "properties": {
+             "id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,29}$"
+             },
+             "label": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 60
+             },
+             "type": {
+              "type": "string",
+              "enum": [
+               "name",
+               "email",
+               "phone",
+               "text",
+               "textarea",
+               "number"
+              ]
+             },
+             "required": {
+              "type": "boolean"
+             },
+             "maxLength": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000
+             }
+            },
+            "required": [
+             "id",
+             "label",
+             "type",
+             "required",
+             "maxLength"
+            ]
+           },
+           "maxItems": 8
+          }
+         },
+         "required": [
+          "enabled",
+          "title",
+          "fields"
+         ]
+        },
+        "client": {
+         "type": "object",
+         "properties": {
+          "mode": {
+           "type": "string",
+           "enum": [
+            "disabled",
+            "prefill",
+            "authenticated"
+           ]
+          },
+          "sandboxVerificationUrl": {
+           "type": "string",
+           "format": "uri",
+           "maxLength": 2048
+          },
+          "verificationUrl": {
+           "type": "string",
+           "format": "uri",
+           "maxLength": 2048
+          }
+         },
+         "required": [
+          "mode"
+         ]
         }
        },
        "required": [
@@ -10029,7 +10278,152 @@
      "auth": "public",
      "encryptedBody": false,
      "permissions": [],
-     "input": {},
+     "input": {
+      "body": {
+       "type": "object",
+       "properties": {
+        "fields": {
+         "type": "object",
+         "additionalProperties": {
+          "type": "string",
+          "maxLength": 1000
+         }
+        },
+        "identity": {
+         "type": "object",
+         "properties": {
+          "subject": {
+           "type": "string",
+           "minLength": 1,
+           "maxLength": 150
+          },
+          "email": {
+           "type": "string",
+           "format": "email",
+           "maxLength": 255
+          },
+          "name": {
+           "type": "string",
+           "minLength": 1,
+           "maxLength": 150
+          }
+         },
+         "required": [
+          "email",
+          "name"
+         ],
+         "additionalProperties": false
+        },
+        "clientContext": {
+         "type": "object",
+         "properties": {
+          "credential": {
+           "type": "string",
+           "minLength": 40,
+           "maxLength": 4096
+          },
+          "expiresAt": {
+           "type": "integer",
+           "minimum": 0
+          },
+          "environment": {
+           "type": "string",
+           "enum": [
+            "production",
+            "sandbox"
+           ],
+           "default": "production"
+          }
+         },
+         "required": [
+          "credential",
+          "expiresAt"
+         ],
+         "additionalProperties": false
+        }
+       },
+       "additionalProperties": false
+      }
+     },
+     "exposed": true
+    },
+    {
+     "id": "PUT /webchat/embed/:key/session/client",
+     "method": "PUT",
+     "path": "/webchat/embed/:key/session/client",
+     "params": [
+      "key"
+     ],
+     "auth": "public",
+     "encryptedBody": false,
+     "permissions": [],
+     "input": {
+      "body": {
+       "type": "object",
+       "properties": {
+        "fields": {
+         "type": "object",
+         "additionalProperties": {
+          "type": "string",
+          "maxLength": 1000
+         }
+        },
+        "identity": {
+         "type": "object",
+         "properties": {
+          "subject": {
+           "type": "string",
+           "minLength": 1,
+           "maxLength": 150
+          },
+          "email": {
+           "type": "string",
+           "format": "email",
+           "maxLength": 255
+          },
+          "name": {
+           "type": "string",
+           "minLength": 1,
+           "maxLength": 150
+          }
+         },
+         "required": [
+          "email",
+          "name"
+         ],
+         "additionalProperties": false
+        },
+        "clientContext": {
+         "type": "object",
+         "properties": {
+          "credential": {
+           "type": "string",
+           "minLength": 40,
+           "maxLength": 4096
+          },
+          "expiresAt": {
+           "type": "integer",
+           "minimum": 0
+          },
+          "environment": {
+           "type": "string",
+           "enum": [
+            "production",
+            "sandbox"
+           ],
+           "default": "production"
+          }
+         },
+         "required": [
+          "credential",
+          "expiresAt"
+         ],
+         "additionalProperties": false
+        }
+       },
+       "additionalProperties": false
+      }
+     },
      "exposed": true
     },
     {

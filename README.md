@@ -62,3 +62,11 @@ npm test
 ```
 
 O teste de catálogo falha se `src/catalog.json` estiver desatualizado em relação às rotas do cs-services.
+
+## Projetos e conhecimento
+
+Use `rbot_select_project` com o nome exato do projeto antes de configurá-lo. A sessão adotada é mantida nas chamadas seguintes e restaurada após expiração; falha na restauração interrompe a operação. `rbot_session` permite conferir a organização atual.
+
+`rbot_knowledge_import` cria ou atualiza até 50 perguntas e respostas pelo serviço de conhecimento, com geração dos embeddings pelo backend. O parâmetro `expectedProjectName` precisa coincidir com o projeto selecionado. Entradas com pergunta idêntica entre os primeiros 100 registros são atualizadas; o resultado informa o sucesso de cada operação. Confira `GET /collaborators/knowledge/status` para verificar a sincronização vetorial.
+
+O catálogo inclui as configurações de identidade do webchat, as preferências individuais de email e o contrato estruturado das integrações. Credenciais retornadas pela API são omitidas das respostas de ferramentas.

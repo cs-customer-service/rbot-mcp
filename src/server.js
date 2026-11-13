@@ -1,7 +1,7 @@
 import { createRequire } from "node:module";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
-import { RbotClient, summarizeUser } from "./client.js";
+import { RbotClient, summarizeUser, redactCredentials } from "./client.js";
 import { RbotError } from "./http.js";
 import { SESSION_TOOLS, buildTools, toolName } from "./tools.js";
 
@@ -25,6 +25,8 @@ export function createServer({ config, catalog = defaultCatalog, fetchImpl } = {
   server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [...SESSION_TOOLS, ...tools] }));
 
   const handlers = {
+    rbot_knowledge_import: async (args) => text(await client.importKnowledge(args), config.maxOutputChars),
+    rbot_select_project: async (args) => text(await client.selectProject(args), config.maxOutputChars),
     rbot_login: async (args) => text(await client.login(args), config.maxOutputChars),
     rbot_logout: async () => text(await client.logout(), config.maxOutputChars),
     rbot_session: async () => text({ loggedIn: Boolean(client.token), user: summarizeUser(client.user), apiUrl: config.apiUrl }, config.maxOutputChars),
@@ -47,7 +49,7 @@ export function createServer({ config, catalog = defaultCatalog, fetchImpl } = {
       const route = routes.get(`${name}::${args.operation}`);
       if (!route) return failure(`Operação desconhecida para ${name}: ${args.operation}`);
       const { status, data } = await client.call(route, args);
-      const result = text({ status, response: data }, config.maxOutputChars);
+      const result = text({ status, response: redactCredentials(data) }, config.maxOutputChars);
       return status >= 400 ? { ...result, isError: true } : result;
     } catch (error) {
       if (error instanceof RbotError) return failure(error.message);
